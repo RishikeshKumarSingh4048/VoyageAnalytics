@@ -1,0 +1,14 @@
+artifact_uri: file:///c:/Users/ilove/OneDrive/Documents/voyage4/mlruns/357778019305327527/8758683408f14ac3a436785c7735ac0f/artifacts
+end_time: 1758490594059
+entry_point_name: ''
+experiment_id: '357778019305327527'
+lifecycle_stage: active
+run_id: 8758683408f14ac3a436785c7735ac0f
+run_name: experiment_2
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1758490593223
+status: 3
+tags: []
+user_id: ilove

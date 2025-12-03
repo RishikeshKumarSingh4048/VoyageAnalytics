@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Travel Prediction Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {margin:0; padding:0; box-sizing:border-box; font-family:'Roboto', sans-serif;}
+        html, body {height:100%; overflow-x:hidden;}
+        body {
+            background: linear-gradient(120deg, #f6d365, #fda085, #f6d365, #fda085);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            position: relative;
+        }
+        @keyframes gradientBG {
+            0% {background-position:0% 50%;}
+            50% {background-position:100% 50%;}
+            100% {background-position:0% 50%;}
+        }
+
+        .ball {
+            position:absolute;
+            width:20px;
+            height:20px;
+            border-radius:50%;
+            opacity:0.6;
+            animation: float 10s linear infinite;
+        }
+        @keyframes float {
+            0% {transform:translateY(100vh);}
+            100% {transform:translateY(-50px);}
+        }
+
+        .flight {
+            position:absolute;
+            width:60px;
+            animation: fly 15s linear infinite;
+            opacity:0.7;
+        }
+        @keyframes fly {
+            0% {transform:translateX(-100px) translateY(0px) rotate(0deg);}
+            25% {transform:translateX(25vw) translateY(50px) rotate(10deg);}
+            50% {transform:translateX(50vw) translateY(0px) rotate(-10deg);}
+            75% {transform:translateX(75vw) translateY(50px) rotate(10deg);}
+            100% {transform:translateX(110vw) translateY(0px) rotate(0deg);}
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 950px;
+            margin: 50px auto;
+            padding: 30px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {text-align:center; margin-bottom:20px; color:#333;}
+        form {display:flex; flex-direction:column; gap:15px;}
+        label {font-weight:bold; color:#555;}
+        small {color:#888; font-style:italic; font-size:0.9rem;}
+        select,input[type="text"],input[type="number"]{
+            padding:10px; border-radius:10px; border:1px solid #ccc; font-size:1rem;
+        }
+        input[type="submit"]{
+            padding:12px; font-size:1.2rem; font-weight:bold;
+            border:none; border-radius:10px;
+            background: linear-gradient(90deg,#ff758c,#ff7eb3);
+            color:white; cursor:pointer; transition:0.3s;
+        }
+        input[type="submit"]:hover {background: linear-gradient(90deg,#ff7eb3,#ff758c);}
+        .output {
+            margin-top:20px; padding:15px;
+            border-radius:10px;
+            background:#f0f4ff; font-size:1.1rem; color:#333;
+        }
+
+        .task-section {display:none; flex-direction:column; gap:10px;}
+    </style>
+</head>
+<body>
+
+    <!-- Animated Balls -->
+    {% for i in range(15) %}
+    <div class="ball" style="background: hsl({{ i*24 }}, 70%, 60%); left:{{ i*6 }}vw; animation-duration: {{ 8+i%5 }}s;"></div>
+    {% endfor %}
+
+    <!-- Animated Flights -->
+    <img src="https://i.imgur.com/3g1Gx1f.png" class="flight" style="top:50px;">
+    <img src="https://i.imgur.com/3g1Gx1f.png" class="flight" style="top:150px; animation-duration: 18s;">
+    <img src="https://i.imgur.com/3g1Gx1f.png" class="flight" style="top:250px; animation-duration: 20s;">
+
+    <div class="container">
+        <h1>Travel Prediction Dashboard</h1>
+
+        <form method="POST">
+            <label>Task:</label>
+            <select name="task" id="taskSelect" required onchange="showSection()">
+                <option value="gender" {% if user_input.task == "gender" %}selected{% endif %}>Predict Gender</option>
+                <option value="flight_type" {% if user_input.task == "flight_type" %}selected{% endif %}>Predict Flight Type</option>
+                <option value="flight_price" {% if user_input.task == "flight_price" %}selected{% endif %}>Predict Flight Price</option>
+                <option value="hotel_recommend" {% if user_input.task == "hotel_recommend" %}selected{% endif %}>Hotel Recommendations</option>
+            </select>
+
+            <!-- Gender Section -->
+            <div class="task-section" id="genderSection">
+                <label>Flights Count: <small>Total flights taken by user</small></label>
+                <input type="number" name="flights_count" value="{{ user_input.flights_count or 0 }}">
+                <label>Hotels Count: <small>Total hotels booked by user</small></label>
+                <input type="number" name="hotels_count" value="{{ user_input.hotels_count or 0 }}">
+                <label>Average Flight Price: <small>Average price per flight</small></label>
+                <input type="number" step="0.01" name="avg_flight_price" value="{{ user_input.avg_flight_price or 0 }}">
+                <label>Average Hotel Price per Night: <small>Average hotel nightly price</small></label>
+                <input type="number" step="0.01" name="avg_hotel_price_per_night" value="{{ user_input.avg_hotel_price_per_night or 0 }}">
+                <label>Average Flight Time: <small>Average flight duration</small></label>
+                <input type="number" step="0.01" name="avg_flight_time" value="{{ user_input.avg_flight_time or 0 }}">
+                <label>Average Hotel Days: <small>Average stay duration at hotels</small></label>
+                <input type="number" step="0.01" name="avg_hotel_days" value="{{ user_input.avg_hotel_days or 0 }}">
+                <label>Total Spent on Hotels: <small>Total money spent on hotels</small></label>
+                <input type="number" step="0.01" name="total_spent_on_hotels" value="{{ user_input.total_spent_on_hotels or 0 }}">
+                <label>Average Distance: <small>Average flight distance</small></label>
+                <input type="number" step="0.01" name="avg_distance" value="{{ user_input.avg_distance or 0 }}">
+            </div>
+
+            <!-- Flight Type Section -->
+            <div class="task-section" id="flightSection">
+                <label>From City: <small>Departure city of flight</small></label>
+                <select name="from_city">
+                    <option value="">Select</option>
+                    {% for city in options.from_city %}
+                    <option value="{{ city }}" {% if user_input.from_city == city %}selected{% endif %}>{{ city }}</option>
+                    {% endfor %}
+                </select>
+                <label>To City: <small>Arrival city of flight</small></label>
+                <select name="to_city">
+                    <option value="">Select</option>
+                    {% for city in options.to_city %}
+                    <option value="{{ city }}" {% if user_input.to_city == city %}selected{% endif %}>{{ city }}</option>
+                    {% endfor %}
+                </select>
+                <label>Price: <small>Flight price in USD</small></label>
+                <input type="number" step="0.01" name="price" value="{{ user_input.price or 0 }}">
+                <label>Time (hrs): <small>Flight duration in hours</small></label>
+                <input type="number" step="0.01" name="time" value="{{ user_input.time or 0 }}">
+                <label>Distance (km): <small>Distance covered by flight</small></label>
+                <input type="number" step="0.01" name="distance" value="{{ user_input.distance or 0 }}">
+            </div>
+
+            <!-- Flight Price Section -->
+            <div class="task-section" id="flightPriceSection">
+                <label>From City: <small>Departure city</small></label>
+                <select name="from_city">
+                    <option value="">Select</option>
+                    {% for city in options.from_city %}
+                    <option value="{{ city }}" {% if user_input.from_city == city %}selected{% endif %}>{{ city }}</option>
+                    {% endfor %}
+                </select>
+
+                <label>To City: <small>Arrival city</small></label>
+                <select name="to_city">
+                    <option value="">Select</option>
+                    {% for city in options.to_city %}
+                    <option value="{{ city }}" {% if user_input.to_city == city %}selected{% endif %}>{{ city }}</option>
+                    {% endfor %}
+                </select>
+
+                <label>Flight Type: <small>Select type of flight</small></label>
+                <select name="flight_type">
+                    <option value="">Select</option>
+                    {% for ftype in options.flight_types %}
+                    <option value="{{ ftype }}" {% if user_input.flight_type == ftype %}selected{% endif %}>{{ ftype }}</option>
+                    {% endfor %}
+                </select>
+
+                <label>Distance (km): <small>Total flight distance</small></label>
+                <input type="number" step="0.01" name="distance" value="{{ user_input.distance or 0 }}">
+            </div>
+
+
+            <!-- Hotel Recommendation Section -->
+            <div class="task-section" id="hotelSection">
+                <label>User ID: <small>Select an existing user ID</small></label>
+                <select name="user_id">
+                    <option value="">Select User</option>
+                    {% for uid in options.user_ids %}
+                    <option value="{{ uid }}" {% if user_input.user_id == uid|string %}selected{% endif %}>{{ uid }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <input type="submit" value="Predict">
+        </form>
+
+        {% if prediction %}
+        <div class="output">
+            <strong>Prediction / Recommendations:</strong><br>
+            {{ prediction }}
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function showSection(){
+            const task = document.getElementById("taskSelect").value;
+            document.getElementById("genderSection").style.display = (task === "gender") ? "flex" : "none";
+            document.getElementById("flightSection").style.display = (task === "flight_type") ? "flex" : "none";
+            document.getElementById("flightPriceSection").style.display = (task === "flight_price") ? "flex" : "none";
+            document.getElementById("hotelSection").style.display = (task === "hotel_recommend") ? "flex" : "none";
+        }
+        window.onload = showSection;
+    </script>
+
+</body>
+</html>
